@@ -10,7 +10,7 @@ def main():
     Helpers.get_message_and_signal_definition_from_file()
     Helpers.extract_all_messages()
     Helpers.extract_traces_from_file()
-
+    program.rt_signal_data = Helpers.rt_signal_data
     program.plot()
 
 if __name__ == "__main__":

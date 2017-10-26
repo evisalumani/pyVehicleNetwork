@@ -15,8 +15,12 @@ class Program:
         return list(filter(self.filter_by_msgid_signalname, self.rt_signal_data))
 
     #Plotting
-    map_timestamp = lambda x: x.timestamp
-    map_signal_value = lambda x: x.signal_value
+    # map_timestamp = lambda x: x.timestamp
+    # map_signal_value = lambda x: x.signal_value
+    def map_timestamp(self, x):
+        return x.timestamp
+    def map_signal_value(self, x):
+        return x.signal_value
 
     def plot(self):
         filtered_signals = self.filter() #filtered signals

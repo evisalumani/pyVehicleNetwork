@@ -5,6 +5,7 @@ import json
 from signal import Signal
 from message import Message
 from realTimeData import RealTimeData
+from realTimeSignalData import RealTimeSignalData
 
 class Helpers:
     messages = []
@@ -21,7 +22,7 @@ class Helpers:
         return hex(dec)[2:]  # remove 0x prefix
 
     @classmethod
-    def get_message_and_signal_definition(cls):
+    def get_message_and_signal_definition_from_file(cls):
         with open('data/convereted_dbc_to_json.json') as data_file:
             data = json.load(data_file)
 
@@ -59,6 +60,7 @@ class Helpers:
         values = Helpers.hex_to_binary("".join(data[6:]))
 
         rtdata = RealTimeData(timestamp, message_id, values)
+        cls.translate_raw_values(rtdata) #this modifies the rtdata object
         return rtdata
 
     @classmethod
@@ -72,3 +74,16 @@ class Helpers:
         for msg in cls.can_messages:
             if (msg.message_id == _id):
                 return msg
+
+    @classmethod
+    def translate_raw_values(cls, rtdata):
+        message = Helpers.get_can_message_by_id(rtdata.message_id)
+        # TODO: where to check for the message id, here or in the constructor?
+        if message is None:
+            return
+
+        for signal in message.signals:
+            bit_value = rtdata.raw_values[signal.start_bit : signal.start_bit + signal.bit_length]
+            #print('bit value:', bit_value)
+            rtdata.translated_values.append({'timestamp': rtdata.timestamp, 'signal_name': signal.name, 'signal_value': int(bit_value, 2)})
+            cls.rt_signal_data.append(RealTimeSignalData(rtdata.timestamp, rtdata.message_id, signal.name, int(bit_value, 2)))
