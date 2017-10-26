@@ -1,16 +1,11 @@
-#import program as Program
 from program import Program
-from helpers import Helpers
 
 def main():
-    print("Hello World")
-    #msg_id, sig_name
-    program = Program('c000003', 'TSC1EMSTECU_EngReqTrq_HR')
+    print("Start")
+    #The first 2 parameters are msg_id, sig_name by which to filter the display of real-time data
+    #The next 2 params are the paths of the file containing the dbc definition file (in json) and the data trace
+    program = Program('c000003', 'TSC1EMSTECU_EngReqTrq_HR', 'data/convereted_dbc_to_json.json', "data/trace.asc")
 
-    Helpers.get_message_and_signal_definition_from_file()
-    Helpers.extract_all_messages()
-    Helpers.extract_traces_from_file()
-    program.rt_signal_data = Helpers.rt_signal_data
     program.plot()
 
 if __name__ == "__main__":

@@ -22,8 +22,8 @@ class Helpers:
         return hex(dec)[2:]  # remove 0x prefix
 
     @classmethod
-    def get_message_and_signal_definition_from_file(cls):
-        with open('data/convereted_dbc_to_json.json') as data_file:
+    def get_message_and_signal_definition_from_file(cls, dbc_filepath):
+        with open(dbc_filepath) as data_file:
             data = json.load(data_file)
 
         cls.messages = data['messages']
@@ -44,8 +44,8 @@ class Helpers:
         cls.can_messages = list(map(Helpers.extract_message, cls.messages))
 
     @classmethod
-    def extract_traces_from_file(cls):
-        file = open("data/trace.asc", "r")
+    def extract_traces_from_file(cls, trace_filepath):
+        file = open(trace_filepath, "r")
         trace_lines = file.readlines()[3:-1]  # skip the header
         # print(trace_lines[0].split()) #Index #2 (message_id; remove x in the end); #6-13 (data bytes)
 
