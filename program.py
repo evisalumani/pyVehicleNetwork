@@ -13,9 +13,8 @@ class Program:
         self.startup()
 
     def startup(self):
-        Helpers.get_message_and_signal_definition_from_dbc_file(self.dbc_filepath)
-        Helpers.extract_traces_from_file(self.trace_filepath)
-        self.rt_signal_data = Helpers.rt_signal_data
+        Helpers.extract_message_and_signal_definition_from_dbc_file(self.dbc_filepath)
+        self.rt_signal_data = Helpers.extract_trace_data_from_file(self.trace_filepath)
 
     def filter_by_msgid_signalname(self, x):
         return x.message_id == self.msg_id and x.signal_name == self.sig_name
