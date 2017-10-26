@@ -8,8 +8,7 @@ from realTimeData import RealTimeData
 from realTimeSignalData import RealTimeSignalData
 
 class Helpers:
-    messages = []
-    can_messages = []
+    message_definitions = [] #definition of CAN message structure (including signals per message) as defined in .dbc file
     traces = []
     rt_signal_data = []
 
@@ -22,11 +21,11 @@ class Helpers:
         return hex(dec)[2:]  # remove 0x prefix
 
     @classmethod
-    def get_message_and_signal_definition_from_file(cls, dbc_filepath):
+    def get_message_and_signal_definition_from_dbc_file(cls, dbc_filepath):
         with open(dbc_filepath) as data_file:
             data = json.load(data_file)
 
-        cls.messages = data['messages']
+        cls.message_definitions = list(map(Helpers.extract_message, data['messages']))
 
     @classmethod
     def extract_signal(cls, sig):
@@ -38,10 +37,6 @@ class Helpers:
         message = Message(Helpers.dec_to_hex(msg['id']), msg['name'])
         message.signals = list(map(Helpers.extract_signal, msg['signals']))
         return message
-
-    @classmethod
-    def extract_all_messages(cls):
-        cls.can_messages = list(map(Helpers.extract_message, cls.messages))
 
     @classmethod
     def extract_traces_from_file(cls, trace_filepath):
@@ -71,7 +66,7 @@ class Helpers:
 
     @classmethod
     def get_can_message_by_id(cls, _id):
-        for msg in cls.can_messages:
+        for msg in cls.message_definitions:
             if (msg.message_id == _id):
                 return msg
 
