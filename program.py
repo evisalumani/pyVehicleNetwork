@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import functools
 from helpers import Helpers
 
 class Program:
@@ -55,9 +56,18 @@ class Program:
         return pd.DataFrame([s.to_dict() for s in self.rt_signal_data])
 
     def get_reduced_list_of_signal_data(self):
-        test = list(map(self.magic, self.rt_signal_data))
+        test = [sig_data.do_magic() for sig_data in self.rt_signal_data[0:2]]
+        test_reduced = functools.reduce(list.__add__, test)
+        print(test_reduced)
+        #TODO: it works, just stupid indentation
+        return
+        # test = [sig_data.do_magic() for sig_data in self.rt_signal_data]
+        test = []
+        for sig_data in self.rt_signal_data:
+            test.append(sig_data.do_magic())
+        #test = list(map(self.magic, self.rt_signal_data))
         #test = self.magic()
         print(test[0])
-        # test_reduced = functools.reduce(list.__add__, test)
+        test_reduced = functools.reduce(list.__add__, test)
         # print[test_reduced[0]]
-        # return test_reduced
+        return test_reduced
