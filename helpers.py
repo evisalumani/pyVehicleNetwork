@@ -1,5 +1,5 @@
 import json
-from signal import Signal
+from signalDefinition import SignalDefinition
 from message import Message
 from realTimeData import RealTimeData
 from realTimeSignalData import RealTimeSignalData
@@ -41,7 +41,7 @@ class Helpers:
 
     @classmethod
     def extract_signal_definition(cls, sig):
-        signal = Signal(sig['start_bit'], sig['bit_length'], sig['name'])
+        signal = SignalDefinition(sig['start_bit'], sig['bit_length'], sig['name'])
         return signal
 
     @classmethod
@@ -60,6 +60,12 @@ class Helpers:
         # print(trace_lines[0].split()) #Index #2 (message_id; remove x in the end); #6-13 (data bytes)
 
         #TODO: create a list of RealTimeData objects and return it from here, instead of returning a list of RealTimeSignalData
+        """
+        toreturn = []
+        for trace_line in trace_lines:
+            toreturn.append(Helpers.extract_data_from_trace_lines(trace_line))
+        return toreturn
+        """
         for trace_line in trace_lines:
             Helpers.extract_data_from_trace_lines(trace_line)
 

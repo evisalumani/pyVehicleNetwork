@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import numpy as np
+import pandas as pd
 from helpers import Helpers
 
 class Program:
@@ -49,3 +50,6 @@ class Program:
         plt.ylabel("signal value")
         plt.legend(loc=1)
         plt.show()
+        
+    def get_dataframe_from_signal_data(self):
+        return pd.DataFrame([s.to_dict() for s in self.rt_signal_data])
