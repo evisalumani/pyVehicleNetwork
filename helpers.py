@@ -60,16 +60,16 @@ class Helpers:
         # print(trace_lines[0].split()) #Index #2 (message_id; remove x in the end); #6-13 (data bytes)
 
         #TODO: create a list of RealTimeData objects and return it from here, instead of returning a list of RealTimeSignalData
-        """
+
         toreturn = []
         for trace_line in trace_lines:
             toreturn.append(Helpers.extract_data_from_trace_lines(trace_line))
         return toreturn
-        """
-        for trace_line in trace_lines:
-            Helpers.extract_data_from_trace_lines(trace_line)
 
-        return cls.rt_signal_data
+        # for trace_line in trace_lines:
+        #     Helpers.extract_data_from_trace_lines(trace_line)
+
+        #return cls.rt_signal_data
 
     @classmethod
     def extract_data_from_trace_lines(cls, trace_line):
@@ -101,7 +101,6 @@ class Helpers:
         rt_signal_data = []
         for signal in message_definition.signals:
             bit_value = raw_values[signal.start_bit : signal.start_bit + signal.bit_length]
-            #rtdata.translated_values.append({'timestamp': rtdata.timestamp, 'signal_name': signal.name, 'signal_value': cls.binary_to_dec(bit_value)})
             cls.rt_signal_data.append(RealTimeSignalData(timestamp, message_id, signal.name, cls.binary_to_dec(bit_value)))
             rt_signal_data.append(RealTimeSignalData(timestamp, message_id, signal.name, cls.binary_to_dec(bit_value)))
 

@@ -53,3 +53,11 @@ class Program:
         
     def get_dataframe_from_signal_data(self):
         return pd.DataFrame([s.to_dict() for s in self.rt_signal_data])
+
+    def get_reduced_list_of_signal_data(self):
+        test = list(map(self.magic, self.rt_signal_data))
+        #test = self.magic()
+        print(test[0])
+        # test_reduced = functools.reduce(list.__add__, test)
+        # print[test_reduced[0]]
+        # return test_reduced
