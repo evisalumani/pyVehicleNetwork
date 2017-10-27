@@ -53,8 +53,8 @@ class Program:
         plt.show()
         
     def get_dataframe_from_signal_data(self):
-        #return pd.DataFrame([s.to_dict() for s in self.rt_signal_data])
-        
+        list_signal_values = self.get_reduced_list_of_signal_data()
+        return pd.DataFrame([s.to_dict() for s in list_signal_values])
 
     def get_reduced_list_of_signal_data(self):
         test = [sig_data.do_magic() for sig_data in self.rt_signal_data[0:2]]
