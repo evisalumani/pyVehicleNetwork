@@ -1,12 +1,12 @@
 import json
 from signalDefinition import SignalDefinition
-from message import Message
-from realTimeData import RealTimeData
+from messageDefinition import MessageDefinition
 from realTimeSignalData import RealTimeSignalData
 
 class Helpers:
     message_definitions = [] #definition of CAN message structure (including signals per message) as defined in .dbc file
-    rt_signal_data = [] #TODO: remove this, just make use of array of RealTimeData objects
+    rt_signal_data = [] #array of RealTimeSignalData objects
+    not_found_message_ids = set() #message ids found in the trace, but not in the message definitions
 
     """
     Conversion methods
@@ -37,7 +37,7 @@ class Helpers:
         with open(dbc_filepath) as data_file:
             data = json.load(data_file)
 
-        cls.message_definitions = list(map(Helpers.extract_message_definition, data['messages']))
+        cls.message_definitions = list(map(cls.extract_message_definition, data['messages']))
 
     @classmethod
     def extract_signal_definition(cls, sig):
@@ -46,8 +46,8 @@ class Helpers:
 
     @classmethod
     def extract_message_definition(cls, msg):
-        message = Message(Helpers.dec_to_hex(msg['id']), msg['name'])
-        message.signals = list(map(Helpers.extract_signal_definition, msg['signals']))
+        message = MessageDefinition(cls.dec_to_hex(msg['id']), msg['name'])
+        message.signals = list(map(cls.extract_signal_definition, msg['signals']))
         return message
 
     """
@@ -57,17 +57,16 @@ class Helpers:
     def extract_trace_data_from_file(cls, trace_filepath):
         file = open(trace_filepath, "r")
         trace_lines = file.readlines()[3:-1]  # skip the header and the last line
-        # print(trace_lines[0].split()) #Index #2 (message_id; remove x in the end); #6-13 (data bytes)
 
-        #TODO: create a list of RealTimeData objects and return it from here, instead of returning a list of RealTimeSignalData
+        #TODO: decide which strategy to use: as is, or create a list of RealTimeData objects and return it from here, instead of returning a list of RealTimeSignalData
         """
-        toreturn = []
+        data = []
         for trace_line in trace_lines:
-            toreturn.append(Helpers.extract_data_from_trace_lines(trace_line))
-        return toreturn
+            data.append(cls.extract_data_from_trace_lines(trace_line))
+        return data
         """
         for trace_line in trace_lines:
-            Helpers.extract_data_from_trace_lines(trace_line)
+            cls.extract_data_from_trace_lines(trace_line) #this call modifies rt_signal_data
 
         return cls.rt_signal_data
 
@@ -76,19 +75,17 @@ class Helpers:
         data = trace_line.split()
         timestamp = data[0] #message timestamp
         message_id = data[2][:-1]  #message id; remove 'x' in the end
-        raw_values = Helpers.hex_to_binary("".join(data[6:])) #raw bytes containing signal values for this message
+        raw_values = cls.hex_to_binary("".join(data[6:])) #raw bytes containing signal values for this message
 
         message_definition = cls.get_message_definition_by_id(message_id)
 
-        #TODO: where to check for the message id, here or in the RealTimeData constructor?
+        #check if message_id is found in the message definitions
         if message_definition is None:
+            cls.not_found_message_ids.add(message_id)
             return
 
-        rtdata = RealTimeData(timestamp, message_id, raw_values)
         #translate the signal values
-        rtdata.rt_signal_data = cls.translate_raw_signal_values(timestamp, message_id, raw_values, message_definition)
-        return rtdata
-
+        cls.translate_raw_signal_values(timestamp, message_id, raw_values, message_definition)
 
     @classmethod
     def get_message_definition_by_id(cls, _id):
@@ -98,11 +95,11 @@ class Helpers:
 
     @classmethod
     def translate_raw_signal_values(cls, timestamp, message_id, raw_values, message_definition):
-        rt_signal_data = []
         for signal in message_definition.signals:
             bit_value = raw_values[signal.start_bit : signal.start_bit + signal.bit_length]
-            #rtdata.translated_values.append({'timestamp': rtdata.timestamp, 'signal_name': signal.name, 'signal_value': cls.binary_to_dec(bit_value)})
-            cls.rt_signal_data.append(RealTimeSignalData(timestamp, message_id, signal.name, cls.binary_to_dec(bit_value)))
-            rt_signal_data.append(RealTimeSignalData(timestamp, message_id, signal.name, cls.binary_to_dec(bit_value)))
+            signal_data = RealTimeSignalData(timestamp, message_id, signal.name, cls.binary_to_dec(bit_value))
 
-        return rt_signal_data
+            # besides RealTimeData object, create RealTimeSignalData object
+            # TODO: figure out if RealTimeSignalData is created here, or when only requested by modifying the RealTimeData object
+            # TODO: consider if a RealTimeData object is needed to access the raw_values
+            cls.rt_signal_data.append(signal_data)
