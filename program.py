@@ -11,10 +11,12 @@ class Program:
         self.dbc_filepath = _dbc_filepath
         self.trace_filepath = _trace_filepath
         self.rt_signal_data = []
+        self.message_definitions = []
         self.startup()
 
     def startup(self):
         Helpers.extract_message_and_signal_definition_from_dbc_file(self.dbc_filepath)
+        self.message_definitions = Helpers.message_definitions
         self.rt_signal_data = Helpers.extract_trace_data_from_file(self.trace_filepath)
 
     def filter_by_msgid_signalname(self, x):
@@ -53,3 +55,7 @@ class Program:
         
     def get_dataframe_from_signal_data(self):
         return pd.DataFrame([s.to_dict() for s in self.rt_signal_data])
+
+    def get_message_defitions_dict_for_widget(self):
+        return {msg.name: msg.message_id for msg in self.message_definitions}
+        #return {msg.name: Helpers.hexstr_to_hex(msg.message_id) for msg in self.message_definitions}
