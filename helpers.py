@@ -1,11 +1,13 @@
 import json
 from signalDefinition import SignalDefinition
 from messageDefinition import MessageDefinition
+from realTimeData import RealTimeData
 from realTimeSignalData import RealTimeSignalData
 
 class Helpers:
     message_definitions = [] #definition of CAN message structure (including signals per message) as defined in .dbc file
-    rt_signal_data = [] #array of RealTimeSignalData objects
+    rt_data = [] #list of ReatTimeData objects
+    rt_signal_data = [] #list of RealTimeSignalData objects
     not_found_message_ids = set() #message ids found in the trace, but not in the message definitions
 
     """
@@ -95,11 +97,19 @@ class Helpers:
 
     @classmethod
     def translate_raw_signal_values(cls, timestamp, message_id, raw_values, message_definition):
+        rt_data = RealTimeData(timestamp, message_id, raw_values)
+
         for signal in message_definition.signals:
             bit_value = raw_values[signal.start_bit : signal.start_bit + signal.bit_length]
             signal_data = RealTimeSignalData(timestamp, message_id, signal.name, cls.binary_to_dec(bit_value))
+
+            #update the RealTimeData object by adding the signal value
+            rt_data.rt_signal_data.append(signal_data)
 
             # besides RealTimeData object, create RealTimeSignalData object
             # TODO: figure out if RealTimeSignalData is created here, or when only requested by modifying the RealTimeData object
             # TODO: consider if a RealTimeData object is needed to access the raw_values
             cls.rt_signal_data.append(signal_data)
+
+        #update the list of RealTimeData objects
+        cls.rt_data.append(rt_data)
