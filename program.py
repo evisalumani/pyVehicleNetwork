@@ -57,7 +57,7 @@ class Program:
         return pd.DataFrame([s.to_dict() for s in list_signal_values])
 
     def get_reduced_list_of_signal_data(self):
-        test = [sig_data.do_magic() for sig_data in self.rt_signal_data[0:2]]
+        #TODO: takes too long if only self.rt_signal_data is considered
+        test = [sig_data.do_magic() for sig_data in self.rt_signal_data[0:5]]
         test_reduced = functools.reduce(list.__add__, test)
-        print(test_reduced[0].to_dict())
         return test_reduced

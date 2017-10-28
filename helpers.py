@@ -7,6 +7,7 @@ from realTimeSignalData import RealTimeSignalData
 class Helpers:
     message_definitions = [] #definition of CAN message structure (including signals per message) as defined in .dbc file
     rt_signal_data = [] #TODO: remove this, just make use of array of RealTimeData objects
+    not_found_ids = set()
 
     """
     Conversion methods
@@ -63,7 +64,12 @@ class Helpers:
 
         toreturn = []
         for trace_line in trace_lines:
-            toreturn.append(Helpers.extract_data_from_trace_lines(trace_line))
+            extracted_data = Helpers.extract_data_from_trace_lines(trace_line)
+            if extracted_data is not None:
+                toreturn.append(extracted_data)
+
+        print('Not found IDs')
+        print(cls.not_found_ids)
         return toreturn
 
         # for trace_line in trace_lines:
@@ -82,6 +88,7 @@ class Helpers:
 
         #TODO: where to check for the message id, here or in the RealTimeData constructor?
         if message_definition is None:
+            cls.not_found_ids.add(message_id)
             return
 
         rtdata = RealTimeData(timestamp, message_id, raw_values)
