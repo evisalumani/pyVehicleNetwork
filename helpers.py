@@ -23,7 +23,7 @@ class Helpers:
 
     @classmethod
     def dec_to_hex(cls, dec):
-        return hex(dec)[2:]  # remove 0x prefix
+        return hex(dec) #[2:] to remove 0x prefix
 
     @classmethod
     def hex_to_binary(cls, hex_data):
@@ -91,8 +91,9 @@ class Helpers:
 
     @classmethod
     def get_message_definition_by_id(cls, _id):
+        #_id has no 0x prefix
         for msg in cls.message_definitions:
-            if (msg.message_id == _id):
+            if (msg.message_id[2:] == _id):
                 return msg
 
     @classmethod
